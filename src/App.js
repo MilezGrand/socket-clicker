@@ -1,23 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import axios from "axios";
+import { useEffect, useState } from "react";
+import socket from './socket';
 
 function App() {
+  let [score, setScore] = useState(0);
+
+  useEffect(() => {
+    axios.get('http://localhost:8000/getscore').then(({ data }) => {setScore(data)})
+    socket.on('update', ( mainScore) => {
+      setScore(mainScore)
+    });
+  }, []);
+  
+  const clickHandler = async () => {
+    setScore(score + 1);
+    socket.emit('scoreChanged', score);
+  }
+
+  window.socket = socket;
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>{score}</h1>
+      <h1>Артуриков</h1>
+      <img src="/img/artur.png" onClick={clickHandler} width="500"/>    
     </div>
   );
 }
